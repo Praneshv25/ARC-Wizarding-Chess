@@ -1,3 +1,9 @@
+// To program the ESP8266:
+//    1) Plug ESP8266 into programmer
+//    2) Plug programmer into USB port
+//    3) Press the ESP8266's program button which is on the programmer
+//    4) Click on the Arduino IDE => button to program
+
 #include <ESP8266WiFi.h>
 
 const char* ssid = "wizardschess";

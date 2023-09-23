@@ -1,3 +1,9 @@
+//To program the Pico:
+//    1) Press and hold the Pico's BOOTSEL button
+//    2) Plug pico into USB port
+//    3) Release the Pico's BOOTSEL button
+//    4) Click on the Arduino IDE => button to program
+
 const int BUTTON_PIN = 28;
 const int TX_PIN = 0;
 const int RX_PIN = 1;
