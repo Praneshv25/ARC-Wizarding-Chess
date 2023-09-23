@@ -7,7 +7,7 @@
 - Install [Arduino-esp8266 core](https://github.com/esp8266/Arduino#installing-with-boards-manager)
 - Get [ESP8266 Programmer](https://www.amazon.com/Stemedu-ESP8266-Adapter-Programmer-Downloader/dp/B097SZMK2W/ref=sr_1_5?crid=U1AE1M3XHZB0&keywords=esp01%2Bprogrammer&qid=1694477509&sprefix=esp01%2Bprogramme%2Caps%2C109&sr=8-5&th=1)
 - Upload [picoCode.ino](./picoCode/picoCode.ino) to your pico
-- Upload [espCode.ino](./espCode/espCode.ino) to your esp8266
+- Upload [espCode.ino](./espCode/espCode.ino) to your esp8266 **IMPORTANT** You must change the ESP's ID number in the code to a unique value before uploading
 - Connect the esp8266 to the pico as follows:
   - ESP8266 GND -> Pico GND
   - ESP8266 VCC -> Pico 3V3
