@@ -12,8 +12,8 @@
   - ESP8266 GND -> Pico GND
   - ESP8266 VCC -> Pico 3V3
   - ESP8266 EN (sometimes called CH_PD) -> Pico 3V3
-  - ESP8266 TX -> Pico GP0
-  - ESP8266 RX -> Pico GP1
+  - ESP8266 RX -> Pico GP0
+  - ESP8266 TX -> Pico GP1
   - ESP8266 GPIO-0 -> Status LED (optional)
 - (For now, ignore the [TCPClient.cpp](./picoCode/TCPClient.cpp) and [constants.h](./picoCode/constants.h) files)
 - Configure a static IP for your computer [Instructions for OSX](https://support.apple.com/guide/mac-help/use-dhcp-or-a-manual-ip-address-on-mac-mchlp2718/mac). For other OS's instructions can be found on google
