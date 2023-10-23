@@ -1,52 +1,39 @@
-import atexit
 import socket
 import threading
 
-# This script is a test and meant to be run from the python console.
-# >>> from PythonTestServer import ESPServer
-# >>> server = ESPServer()
-# >>> server.send_command('ESP1', '1')
-
 
 class ESPServer:
-    def __init__(self, host='0.0.0.0', port=1234):
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((host, port))
-        self.server_socket.listen(5)
-        self.clients = {}
+    def __init__(self, port=12345):
+        self.UDP_PORT = port
+        self.BUFFER_SIZE = 1024
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind(("", self.UDP_PORT))
 
-        self.server_thread = threading.Thread(target=self.start_server)
-        self.server_thread.start()
+        self.devices = {}  # Mapping of device_id to IP_address
 
-        # Register the cleanup function to be called on exit
-        atexit.register(self.cleanup)
+        # Start listening for messages on a new thread
+        self.listen_thread = threading.Thread(target=self.start_listening)
+        self.listen_thread.daemon = True  # Daemon threads will exit when the main program exits
+        self.listen_thread.start()
 
-    def start_server(self):
+    def start_listening(self):
         while True:
-            client_socket, client_address = self.server_socket.accept()
-            print(f"Connection from {client_address}")
+            data, addr = self.sock.recvfrom(self.BUFFER_SIZE)
+            data_str = data.decode('utf-8')
+            print(f"Recieved packet data {data}, addr {addr}, str {data_str}")
 
-            client_id = client_socket.recv(1024).decode('utf-8')
-            self.clients[client_id] = client_socket
+            # If the message starts with "INIT:", it's an initialization message from an ESP8266
+            if data_str.startswith("INIT:"):
+                device_id = data_str.split(":")[1]
+                self.devices[device_id] = addr[0]
+                print(f"Device {device_id} connected with IP {addr[0]}")
+            else:
+                # Handle other messages here
+                print(f"Received from {addr[0]}: {data_str}")
 
-    def send_command(self, client_id, command):
-        if client_id in self.clients:
-            try:
-                self.clients[client_id].sendall(command.encode('utf-8'))
-                response = self.clients[client_id].recv(1024)
-                print(f"Response from {client_id}: {response.decode('utf-8')}")
-            except Exception as e:
-                print(f"Failed to communicate with {client_id}, with exception {e}")
+    def send_command(self, device_id, command):
+        if device_id in self.devices:
+            UDP_IP = self.devices[device_id]
+            self.sock.sendto(command.encode('utf-8'), (UDP_IP, self.UDP_PORT))
         else:
-            print(f"No client with ID: {client_id}")
-
-    def cleanup(self):
-        print("Cleaning up before exit...")
-
-        # Close client connections
-        for client_socket in self.clients.values():
-            client_socket.close()
-
-        # Close server socket
-        self.server_socket.close()
-        exit(0)
+            print(f"No device found with ID {device_id}")
