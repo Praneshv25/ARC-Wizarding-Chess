@@ -1,11 +1,18 @@
 import socket
 import threading
 
+# Usage
+# To initialize and use the server:
+# >>> from PythonTestServer import ESPServer
+# >>> server = ESPServer()
+# To send a command:
+# >>> server.send_command(1, bytearray([0x01, 0x02, ..., 0x10]))
+
 
 class ESPServer:
     def __init__(self, port=12345):
         self.UDP_PORT = port
-        self.BUFFER_SIZE = 1024
+        self.BUFFER_SIZE = 16  # Set the buffer size to 16 bytes for the byte array
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(("", self.UDP_PORT))
 
@@ -19,21 +26,32 @@ class ESPServer:
     def start_listening(self):
         while True:
             data, addr = self.sock.recvfrom(self.BUFFER_SIZE)
-            data_str = data.decode('utf-8')
-            print(f"Recieved packet data {data}, addr {addr}, str {data_str}")
-
-            # If the message starts with "INIT:", it's an initialization message from an ESP8266
-            if data_str.startswith("INIT:"):
-                device_id = data_str.split(":")[1]
-                self.devices[device_id] = addr[0]
-                print(f"Device {device_id} connected with IP {addr[0]}")
+            if len(data) <= 16:
+                # Handle the initialization sequence and normal commands
+                if data[0] == 0xaa:  # Check if this is an init packet
+                    device_id = data[1]
+                    checksum = data[2]
+                    # Perform a simple checksum validation
+                    if checksum == (device_id & 0xFF):
+                        self.devices[device_id] = addr[0]
+                        print(f"Device {device_id} initialized with IP {addr[0]}")
+                    else:
+                        print(f"Checksum mismatch for device ID {device_id}")
+                else:
+                    print(f"Received data from {addr[0]}: {data}")
             else:
-                # Handle other messages here
-                print(f"Received from {addr[0]}: {data_str}")
+                print(data)
+                print(f"Invalid packet size from {addr[0]}")
 
     def send_command(self, device_id, command):
         if device_id in self.devices:
             UDP_IP = self.devices[device_id]
-            self.sock.sendto(command.encode('utf-8'), (UDP_IP, self.UDP_PORT))
+            # Check if the command is a bytearray and its length is 16 or less
+            if isinstance(command, bytearray) and len(command) <= 16:
+                # Pad the command with zeros if it's less than 16 bytes
+                self.sock.sendto(command, (UDP_IP, self.UDP_PORT))
+            else:
+                print(f"Command must be a bytearray with a length of 16 or less.")
         else:
             print(f"No device found with ID {device_id}")
+
