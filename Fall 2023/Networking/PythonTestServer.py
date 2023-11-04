@@ -46,7 +46,7 @@ class ESPServer:
     def send_command(self, device_id, command):
         if device_id in self.devices:
             UDP_IP = self.devices[device_id]
-            # Check if the command is a bytearray and its length is 16 or less
+            # Check if the command is a bytearray, and its length is 16 or less
             if isinstance(command, bytearray) and len(command) <= 16:
                 # Pad the command with zeros if it's less than 16 bytes
                 self.sock.sendto(command, (UDP_IP, self.UDP_PORT))
