@@ -13,7 +13,7 @@ def main():
     cap = cv2.VideoCapture(0)
 
     # List of corner tag IDs to detect
-    target_tag_ids = [0, 1, 2, 3]  # [Top Left, Bottom Left, Bottom Right, Top Right]
+    target_tag_ids = [12, 13, 7, 6]  # [Top Left, Bottom Left, Bottom Right, Top Right]
 
     while True:
         # Capture a frame from the camera
@@ -52,13 +52,13 @@ def main():
                 for tag_id, tag_corners in tag_corners_dict.items():
                     for i, corner in enumerate(tag_corners):
                         x, y = corner.ravel()
-                        if tag_id == 0 and i == 1:
+                        if tag_id == target_tag_ids[0] and i == 0:
                             top_left = (x, y)
-                        elif tag_id == 1 and i == 1:
+                        elif tag_id == target_tag_ids[1] and i == 0:
                             bottom_left = (x, y)
-                        elif tag_id == 2 and i == 0:
+                        elif tag_id == target_tag_ids[2] and i == 3:
                             bottom_right = (x, y)
-                        elif tag_id == 3 and i == 1:
+                        elif tag_id == target_tag_ids[3] and i == 0:
                             top_right = (x, y)
 
                         # Draws the corner points:
