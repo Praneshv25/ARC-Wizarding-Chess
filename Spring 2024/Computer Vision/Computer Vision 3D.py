@@ -48,7 +48,6 @@ while True:
 
     # Filter detections for specific tag IDs
     filtered_detections = [detection for detection in detections if detection.tag_id in target_tag_ids]
-    #print("filted: ", filtered_detections)
 
     # Draw lines based on corner coordinates
     if len(filtered_detections) == len(target_tag_ids):

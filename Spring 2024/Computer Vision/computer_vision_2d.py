@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 from pupil_apriltags import Detector
 import linear_equations as le
-import board as bd
+
+distance_const = 70
 
 
 def main():
@@ -147,7 +148,7 @@ def draw_vertical_lines(frame, top_left, bottom_left, bottom_right, top_right, m
     right_bound = [0, 0, 0, 0]
     ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '.']
     for i in range(-4, 5):
-        distance_const = 45
+        # distance_const = 90
         distance = i * distance_const
         bottom_point = [mid2_x, mid2_y]
         top_point = [mid1_x, mid1_y]
@@ -198,7 +199,7 @@ def draw_horizontal_lines(frame, left_bound, right_bound):
 
     files = [None, 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a']
     for i in range(-4, 5):
-        distance_const = 45
+        # distance_const = 90
         distance = i * distance_const
         left_point = [mid1_x, mid1_y]
         right_point = [mid2_x, mid2_y]
