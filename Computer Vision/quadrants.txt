@@ -1,0 +1,12 @@
+Needs to be an overall handler for all four quadrants
+
+Three april tags per quadrant
+
+Quadrant 1: a1 to d4
+    *[bottom_right, bottom_left, top_left]
+Quadrant 2: e1 to h4
+    *[bottom_left, bottom_right, top_right]
+Quadrant 3: a5 to d8
+    *[
+Quadrant 4: e5 to h8
+
