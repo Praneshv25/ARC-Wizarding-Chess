@@ -129,9 +129,9 @@ class VisualGUI():
         self.selected_piece.alternatePosition = (-1, -1)
         self.selected_piece = None
 
-    def main(self) -> str:
+    def main(self, robots_active) -> str:
         # Update text
-        pygame.display.set_caption("White's Turn" if self.turn else "Black's" + "'s Turn")
+        pygame.display.set_caption("White's Turn" if self.turn else "Black's Turn")
 
         # Handle events ------------------------
         for event in pygame.event.get():
@@ -150,6 +150,10 @@ class VisualGUI():
                 if self.selected_piece:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     new_row, new_col = mouse_y // SQUARE_SIZE, mouse_x // SQUARE_SIZE
+                    if new_row == 0 and new_col == 9:
+                        return "robots"
+                    if new_row < 0 or new_row > 7 or new_col < 0 or new_col > 7:
+                        return "invalid move"
                     # Get move
                     print("Moving piece from (" + str(self.selected_piece.row) + ", " + str(self.selected_piece.column) + ") to (" + str(new_row) + ", " + str(new_col) + ")")
                     # Both positions
@@ -169,6 +173,12 @@ class VisualGUI():
 
         # Draw chessboard background
         draw_board(self.screen)
+
+        # Draw robots on/off
+        if (robots_active):
+            pygame.draw.rect(self.screen, (10, 150, 10), pygame.Rect(9 * SQUARE_SIZE, 0, SQUARE_SIZE, SQUARE_SIZE))
+        else:
+            pygame.draw.rect(self.screen, (150, 10, 10), pygame.Rect(9 * SQUARE_SIZE, 0, SQUARE_SIZE, SQUARE_SIZE))
 
         # Draw pieces
         for row in self.board:

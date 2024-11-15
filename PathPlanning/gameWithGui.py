@@ -23,7 +23,7 @@ class Game:
     def run(self):
         visualGUI.createVisualBoard()
         while True:
-            move = visualGUI.main()
+            move = visualGUI.main(self.robots_active)
             if move != None:
                 print(move)
                 try:
@@ -33,6 +33,9 @@ class Game:
                         if self.robots_active:
                             self.board.assume_correct_positions()
                             print("Make sure robot positions align with board")
+                        visualGUI.finishInvalidMove() 
+                    elif move == "invalid move":
+                        visualGUI.finishInvalidMove() 
                     else:
                         parsedMove = chess.Move.from_uci(self.board.parse_san(move[0:4]).uci())
                         self.make_move(parsedMove)
