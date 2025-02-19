@@ -3,6 +3,7 @@ import numpy as np
 from pyapriltags import Detector
 import linear_equations as le
 
+
 distance_const = 70
 
 def main():
