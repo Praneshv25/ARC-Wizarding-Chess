@@ -4,6 +4,7 @@ from pyapriltags import Detector
 import linear_equations as le
 from collections import deque
 
+
 distance_const = 70
 
 def main():
