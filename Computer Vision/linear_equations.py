@@ -68,7 +68,7 @@ def get_y(line, x_coordinate):
     return (slope * x_coordinate) + y_intercept
 
 
-def in_boundary(tag_center, line_top, line_bottom, line_right, line_left):
+'''def in_boundary(tag_center, line_top, line_bottom, line_right, line_left):
     """
     This function calculates whether a tag is within a boundary
     :param tag_center: List of center coordinates of tag (x,y)
@@ -88,4 +88,20 @@ def in_boundary(tag_center, line_top, line_bottom, line_right, line_left):
         (tag_x >= get_x(line_left, tag_y)) and (tag_x <= get_x(line_right, tag_y))):
         within_boundary = True
 
-    return within_boundary
+    return within_boundary'''
+
+
+def in_boundary(tag_center, top_left, bottom_right):
+    """
+    This function checks whether a tag is within a rectangular boundary.
+
+    :param tag_center: Tuple or list containing (x, y) coordinates of the tag center.
+    :param top_left: Tuple or list containing (x, y) coordinates of the top-left corner of the boundary.
+    :param bottom_right: Tuple or list containing (x, y) coordinates of the bottom-right corner of the boundary.
+    :return: True if the tag is within the boundary, False otherwise.
+    """
+    tag_x, tag_y = tag_center
+    x1, y1 = top_left
+    x2, y2 = bottom_right
+
+    return x1 <= tag_x <= x2 and y1 <= tag_y <= y2

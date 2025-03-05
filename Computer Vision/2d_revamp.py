@@ -77,7 +77,9 @@ def main():
                     draw_bounding_box(frame, top_left, bottom_left, bottom_right, top_right)
                     left_bound, right_bound = draw_vertical_lines(frame, top_left, bottom_left, bottom_right, top_right, mid1_x, mid1_y,
                                        mid2_x, mid2_y)
-                    identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_left, bottom_right,
+
+                    #Dictionary with square name as key tag id as content
+                    tag_location_dict = identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_left, bottom_right,
                                            top_right, left_bound, right_bound)
         else:
             cv2.putText(frame, "Not all tags detected!", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -267,23 +269,33 @@ def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_l
                          (int(new_left[0] + distance_const+ j*distance_const), (int(new_left[1])) + distance_const)))
 
     coordinate_dict = {}
+    tag_location_dict = {}
 
 
     for i in range(1, 9):  # Numbers 1 to 8
         for j in range(ord('a'), ord('h') + 1):  # Letters 'a' to 'h'
             key = f"{chr(j)}{i}"  # Create key as "a1", "b2", etc.
             coordinate_dict[key] = box_coords.popleft()
+            tag_location_dict[key] = ""
 
 
     #coordinate_dict now holds coordinates of each square stored in "a1", "c4", etc
 
 
-
+    for detection in detections:
+        if detection.tag_id not in target_tag_ids:
+            #print(f"detected {detection.tag_id}")
+            for i in range(1, 9):  # Numbers 1 to 8
+                for j in range(ord('a'), ord('h') + 1):  # Letters 'a' to 'h'
+                    key = f"{chr(j)}{i}"
+                    if le.in_boundary(detection.center, coordinate_dict[key][0], coordinate_dict[key][1]):
+                        #print(f"Detection in {key}")
+                        tag_location_dict[key] = detection.tag_id
 
 
 
     # Draw the IDs of tags not in target_tag_ids if they fall within the bounding box
-    for detection in detections:
+    '''for detection in detections:
         if detection.tag_id not in target_tag_ids:
             cv2.putText(frame, str(detection.tag_id), (int(detection.center[0]), int(detection.center[1])),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
@@ -302,7 +314,10 @@ def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_l
             line_right = [top_right[0], top_right[1], bottom_right[0], bottom_right[1]]
 
             if le.in_boundary(detection.center, line_top, line_bottom, line_right, line_left):
-                cv2.putText(frame, "Area 2", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(frame, "Area 2", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)'''
+
+    return tag_location_dict
+    #Returns dictionary with either a piece or nothing in the a3, d7, or whatever square
 
 if __name__ == "__main__":
     main()

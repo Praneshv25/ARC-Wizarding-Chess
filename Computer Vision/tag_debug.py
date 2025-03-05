@@ -1,5 +1,5 @@
 import cv2
-from pupil_apriltags import Detector
+from pyapriltags import Detector
 
 detector = Detector(families='tag36h11')
 
@@ -20,3 +20,5 @@ while True:
     for detection in detections:
         cv2.putText(frame, str(detection.tag_id), (int(detection.center[0]), int(detection.center[1])),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+    cv2.imshow('Frame', frame)

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from pupil_apriltags import Detector
+from pyapriltags import Detector
 cv2d = __import__('2d_revamp')
 
 
@@ -114,8 +114,10 @@ while True:
             left_bound, right_bound = cv2d.draw_vertical_lines(result, top_left, bottom_left, bottom_right, top_right, mid1_x, mid1_y,
                                      mid2_x, mid2_y)
 
-            cv2d.identify_apriltag_area(detections, target_tag_ids, result, top_left, bottom_left, bottom_right,
+            # Dictionary with square name as key tag id as content
+            tag_location_dict = cv2d.identify_apriltag_area(detections, target_tag_ids, result, top_left, bottom_left, bottom_right,
                                         top_right, left_bound, right_bound)
+            #print(tag_location_dict)
 
         cv2.imshow("Perspective transform", result)
 
