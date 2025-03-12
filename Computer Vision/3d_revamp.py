@@ -116,7 +116,9 @@ while True:
 
             # Dictionary with square name as key tag id as content
             tag_location_dict = cv2d.identify_apriltag_area(detections, target_tag_ids, result, top_left, bottom_left, bottom_right,
-                                        top_right, left_bound, right_bound)
+                                        top_right, left_bound, right_bound, matrix)
+
+
             #print(tag_location_dict)
 
         cv2.imshow("Perspective transform", result)

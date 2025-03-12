@@ -214,7 +214,7 @@ def draw_horizontal_lines(frame, left_bound, right_bound):
                     (int(new_left[0] - (distance_const / 2)), int(new_left[1] + (distance_const / 2))),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_left, bottom_right, top_right, left_bound, right_bound):
+def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_left, bottom_right, top_right, left_bound, right_bound, matrix):
     """
     Identifies if the unspecified april tags are in a designated area
     :param detections:
@@ -259,9 +259,11 @@ def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_l
             new_left = le.get_new_point(distance, angle_deg_left, left_point)
 
             #Drew this rectangle to make sure it is in the right spot
+
+            #Testing without this
             cv2.rectangle(frame,
                          (int(new_left[0] + j*distance_const), int(new_left[1])),
-                         (int(new_left[0] + distance_const+ j*distance_const), (int(new_left[1])) + distance_const),
+                         (int(new_left[0] + distance_const + j*distance_const), (int(new_left[1])) + distance_const),
                          (0, 255, 0),
                           2)
 
@@ -272,9 +274,33 @@ def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_l
     tag_location_dict = {}
 
 
-    for i in range(1, 9):  # Numbers 1 to 8
-        for j in range(ord('a'), ord('h') + 1):  # Letters 'a' to 'h'
-            key = f"{chr(j)}{i}"  # Create key as "a1", "b2", etc.
+    for i in range(ord('h'), ord('a') - 1, -1):  # Letters 'a' to 'h'
+        for j in range(1, 9,):  # Numbers 1 to 8
+            key = f"{chr(i)}{j}"  # Create key as "a1", "b2", etc.
+
+            # Test transfrom
+            points = np.array([
+                [int(new_left[0] + j * distance_const), int(new_left[1])],  # First point
+                [int(new_left[0] + (j + 1) * distance_const), int(new_left[1] + distance_const)]  # Second point
+            ], dtype=np.float32)
+
+            # Reshape to (N, 1, 2)
+            points = points.reshape(-1, 1, 2)
+
+            # Apply perspective transform
+            transformed_points = cv2.perspectiveTransform(points, matrix)
+
+            # Convert to integer tuples
+            pt1 = tuple(map(int, transformed_points[0][0]))  # First transformed point
+            pt2 = tuple(map(int, transformed_points[1][0]))  # Second transformed point
+
+            # Draw the rectangle
+            cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
+
+            # Append to box_coords properly
+            box_coords.append((pt1, pt2))
+
+            # End
             coordinate_dict[key] = box_coords.popleft()
             tag_location_dict[key] = ""
 
@@ -285,36 +311,26 @@ def identify_apriltag_area(detections, target_tag_ids, frame, top_left, bottom_l
     for detection in detections:
         if detection.tag_id not in target_tag_ids:
             #print(f"detected {detection.tag_id}")
+
+            #Transforms point to correct frame and gets in right form for text argument
+            point = np.array([detection.center], dtype=np.float32).reshape(-1, 1, 2)  # Shape (1, 1, 2)
+            transformed_point = cv2.perspectiveTransform(point, matrix)
+            center = tuple(map(int, transformed_point[0][0]))
+
             for i in range(1, 9):  # Numbers 1 to 8
                 for j in range(ord('a'), ord('h') + 1):  # Letters 'a' to 'h'
                     key = f"{chr(j)}{i}"
-                    if le.in_boundary(detection.center, coordinate_dict[key][0], coordinate_dict[key][1]):
+                    if le.in_boundary(center, coordinate_dict[key][0], coordinate_dict[key][1]):
                         #print(f"Detection in {key}")
                         tag_location_dict[key] = detection.tag_id
+                        #print(center)
+                        cv2.putText(frame, key, tuple(center), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
 
 
     # Draw the IDs of tags not in target_tag_ids if they fall within the bounding box
-    '''for detection in detections:
-        if detection.tag_id not in target_tag_ids:
-            cv2.putText(frame, str(detection.tag_id), (int(detection.center[0]), int(detection.center[1])),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            # Detection in area 1 (left)
-            line_top = [top_left[0], top_left[1], mid1_x, mid1_y]
-            line_bottom = [bottom_left[0], bottom_left[1], mid2_x, mid2_y]
-            line_left = [bottom_left[0], bottom_left[1], top_left[0], top_left[1]]
-            line_right = [mid2_x, mid2_y, mid1_x, mid1_y]
-            if le.in_boundary(detection.center, line_top, line_bottom, line_right, line_left):
-                cv2.putText(frame, "Area 1", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    #Old code I don't think I'll need
 
-            # Detection in area 2 right
-            line_top = [mid1_x, mid1_y, top_right[0], top_right[1]]
-            line_bottom = [mid2_x, mid2_y, bottom_right[0], bottom_right[1]]
-            line_left = [mid2_x, mid2_y, mid1_x, mid1_y]
-            line_right = [top_right[0], top_right[1], bottom_right[0], bottom_right[1]]
-
-            if le.in_boundary(detection.center, line_top, line_bottom, line_right, line_left):
-                cv2.putText(frame, "Area 2", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)'''
 
     return tag_location_dict
     #Returns dictionary with either a piece or nothing in the a3, d7, or whatever square
