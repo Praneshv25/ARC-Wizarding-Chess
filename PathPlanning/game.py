@@ -1,6 +1,7 @@
 import wizboard
 import chess
 from PythonServer import  ESPServer
+import speech_movement
 
 # ask for input
 # chess bot moves?
@@ -23,7 +24,7 @@ class Game:
         while True:
             print(self.board)
             try:
-                move = input(f'Type \'robots\' to turn robots {"on" if not self.robots_active else "off"}\n{"White" if self.board.turn == chess.WHITE else "Black"} move:')
+                move = speech_movement.detect_moves()
                 if move == "robots":
                     self.robots_active = not self.robots_active
                     print(f"robots_active: {self.robots_active}")
