@@ -20,6 +20,16 @@ class Game:
                 path.piece.execute_path(path.points)
                 path.piece.send_buffer()
 
+    def check_board(self):
+        if (self.board.is_checkmate()):
+            return 1
+        elif (self.board.is_check()):
+            return 2
+        elif (self.board.is_stalemate() or self.board.is_insufficient_material()):
+            return 3
+        else:
+            return 0
+
     def run(self):
         while True:
             print(self.board)
@@ -37,7 +47,19 @@ class Game:
             except ValueError: 
                 if move == 'quit':
                     break
-                print("invalid move")            
+                print("invalid move")
+
+
+            boardCheck = self.check_board()
+            if boardCheck == 1:
+                winner = "Black" if self.board.turn == chess.WHITE else "White"
+                print(f"Checkmate! {winner} wins.")
+                break
+            elif boardCheck == 2:
+                print("Check")
+            elif boardCheck == 3:
+                print("Draw")
+                break
             
 
 server = ESPServer()
